@@ -421,8 +421,8 @@
             playerStatus.innerText = "Gemini 深度解析中...";
 
             try {
-                // 發送請求給容器內的 FastAPI 後端
-                const response = await fetch('http://localhost:8000/api/recommend', {
+                // 發送請求給 Render 雲端上的 FastAPI 後端
+                const response = await fetch('https://music-ai-app-gibe.onrender.com/api/recommend', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
@@ -473,7 +473,7 @@
 
             } catch (error) {
                 console.error(error);
-                alert('無法連線至後端或 AI 解析失敗，請確認 Docker 容器是否已啟動，且開啟在連接埠 8000。');
+                alert('無法連線至後端或 AI 解析失敗，請確認 Render 雲端服務是否在正常運行中。');
                 playerStatus.innerText = "解析失敗";
             }
         }
