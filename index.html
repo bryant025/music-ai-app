@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OmniSound AI — 智慧音樂探索家</title>
+    <style>
+        :root {
+            --bg-color: #000000;
+            --surface-color: rgba(255, 255, 255, 0.03);
+            --surface-hover: rgba(255, 255, 255, 0.06);
+            --border-color: rgba(255, 255, 255, 0.1);
+            --text-primary: #f5f5f7;
+            --text-secondary: #86868b;
+            --accent-glow: rgba(0, 113, 227, 0.4);
+            --accent-blue: #2997ff;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", Helvetica, Arial, sans-serif;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            overflow-x: hidden;
+            padding-bottom: 120px;
+        }
+
+        header {
+            width: 100%;
+            max-width: 1024px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 24px 32px;
+            border-bottom: 1px solid var(--border-color);
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(20px);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo {
+            font-size: 19px;
+            font-weight: 600;
+            letter-spacing: -0.01em;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .logo span {
+            color: var(--accent-blue);
+        }
+
+        .nav-links {
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        .hero {
+            text-align: center;
+            max-width: 800px;
+            margin: 60px 20px 40px;
+        }
+
+        .hero h1 {
+            font-size: 48px;
+            font-weight: 700;
+            letter-spacing: -0.003em;
+            line-height: 1.1;
+            margin-bottom: 16px;
+            background: linear-gradient(180deg, #ffffff 0%, #a1a1a6 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero p {
+            font-size: 21px;
+            color: var(--text-secondary);
+            font-weight: 400;
+            letter-spacing: 0.011em;
+            line-height: 1.38;
+        }
+
+        .search-container {
+            width: 100%;
+            max-width: 720px;
+            margin: 0 20px 30px;
+            background: var(--surface-color);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 20px;
+            backdrop-filter: blur(30px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+            transition: all 0.3s ease;
+        }
+
+        .search-container:focus-within {
+            border-color: var(--accent-blue);
+            box-shadow: 0 0 30px var(--accent-glow);
+        }
+
+        textarea {
+            width: 100%;
+            background: transparent;
+            border: none;
+            color: var(--text-primary);
+            font-size: 17px;
+            resize: none;
+            outline: none;
+            height: 90px;
+            line-height: 1.5;
+        }
+
+        textarea::placeholder {
+            color: var(--text-secondary);
+        }
+
+        .controls-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 15px;
+            border-top: 1px solid var(--border-color);
+            padding-top: 15px;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .tag-suggestions {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .tag-btn {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: var(--text-secondary);
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .tag-btn:hover {
+            background: rgba(255, 255, 255, 0.12);
+            color: var(--text-primary);
+            border-color: rgba(255, 255, 255, 0.3);
+        }
+
+        .submit-btn {
+            background: var(--accent-blue);
+            color: white;
+            border: none;
+            padding: 10px 24px;
+            border-radius: 980px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+
+        .submit-btn:hover {
+            opacity: 0.9;
+        }
+
+        .matrix-section {
+            width: 100%;
+            max-width: 720px;
+            margin: 0 20px 40px;
+            display: none;
+        }
+
+        .matrix-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+            gap: 12px;
+        }
+
+        .matrix-card {
+            background: var(--surface-color);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 14px;
+            backdrop-filter: blur(10px);
+        }
+
+        .matrix-title {
+            font-size: 11px;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 6px;
+        }
+
+        .matrix-value {
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--accent-blue);
+        }
+
+        .results-section {
+            width: 100%;
+            max-width: 720px;
+            margin: 0 20px;
+        }
+
+        .section-title {
+            font-size: 21px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            letter-spacing: -0.01em;
+        }
+
+        .track-card {
+            background: var(--surface-color);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            backdrop-filter: blur(20px);
+            transition: transform 0.2s, border-color 0.2s;
+        }
+
+        .track-card:hover {
+            border-color: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .track-info h3 {
+            font-size: 17px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .track-meta {
+            font-size: 13px;
+            color: var(--text-secondary);
+            display: flex;
+            gap: 12px;
+        }
+
+        .play-action-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            color: var(--text-primary);
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .play-action-btn:hover {
+            background: var(--accent-blue);
+            border-color: var(--accent-blue);
+        }
+
+        .player-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background: rgba(10, 10, 12, 0.85);
+            backdrop-filter: blur(30px);
+            border-top: 1px solid var(--border-color);
+            padding: 16px 32px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            z-index: 1000;
+            box-shadow: 0 -10px 30px rgba(0,0,0,0.5);
+        }
+
+        .player-left {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .player-title-box h4 {
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .player-title-box p {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        .player-center {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            flex: 1;
+            max-width: 400px;
+            margin: 0 20px;
+        }
+
+        canvas {
+            width: 100%;
+            height: 35px;
+        }
+
+        .player-right {
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="logo">Mood Base Sound <span>Music</span></div>
+        <div class="nav-links"> Beta version</div>
+    </header>
+
+    <div class="hero">
+        <h1>用文字，雕塑你的專屬音樂。</h1>
+        <p>結合情緒、旋律、樂器與藝人風格的多方面搜尋推薦引擎。</p>
+    </div>
+
+    <div class="search-container">
+        <textarea id="promptInput" placeholder="例如：類似 Hans Zimmer 的史詩感配樂，帶有沉穩的大提琴與鋼琴旋律，速度約 75 BPM..."></textarea>
+        <div class="controls-row">
+            <div class="tag-suggestions">
+                <button class="tag-btn" onclick="addTag('Hans Zimmer 風格')">+ Hans Zimmer</button>
+                <button class="tag-btn" onclick="addTag('75 BPM 緩拍')">+ 75 BPM</button>
+                <button class="tag-btn" onclick="addTag('大提琴與鋼琴')">+ 樂器:大提琴/鋼琴</button>
+                <button class="tag-btn" onclick="addTag('深夜孤獨感')">+ 孤獨感</button>
+            </div>
+            <button class="submit-btn" onclick="analyzeAndRecommend()">生成推薦</button>
+        </div>
+    </div>
+
+    <div class="matrix-section" id="matrixSection">
+        <div class="section-title" style="font-size: 17px; margin-bottom: 12px;">你可能想知道...</div>
+        <div class="matrix-grid">
+            <div class="matrix-card">
+                <div class="matrix-title">對標藝人</div>
+                <div class="matrix-value" id="resArtist">-</div>
+            </div>
+            <div class="matrix-card">
+                <div class="matrix-title">情緒情境</div>
+                <div class="matrix-value" id="resMood">-</div>
+            </div>
+            <div class="matrix-card">
+                <div class="matrix-title">旋律結構</div>
+                <div class="matrix-value" id="resMelody">-</div>
+            </div>
+            <div class="matrix-card">
+                <div class="matrix-title">節拍速度</div>
+                <div class="matrix-value" id="resTempo">-</div>
+            </div>
+            <div class="matrix-card">
+                <div class="matrix-title">演出樂器</div>
+                <div class="matrix-value" id="resInst">-</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="results-section">
+        <div class="section-title">推薦音樂清單</div>
+        <div id="trackList">
+            <p style="color: var(--text-secondary); font-size: 14px;">請在上方輸入提示詞，讓 Gemini 爲你進行 5-D 音樂深度解析...</p>
+        </div>
+    </div>
+
+    <div class="player-bar">
+        <div class="player-left">
+            <div class="player-title-box">
+                <h4 id="nowPlayingTitle">未播放音樂</h4>
+                <p id="nowPlayingArtist">點擊上方清單試聽 AI 合成音效</p>
+            </div>
+        </div>
+        <div class="player-center">
+            <canvas id="waveformCanvas"></canvas>
+        </div>
+        <div class="player-right" id="playerStatus">
+            準備就緒
+        </div>
+    </div>
+
+    <script>
+        function addTag(text) {
+            const textarea = document.getElementById('promptInput');
+            textarea.value += (textarea.value ? ' ' : '') + text;
+        }
+
+        async function analyzeAndRecommend() {
+            const prompt = document.getElementById('promptInput').value.trim();
+            const matrixSec = document.getElementById('matrixSection');
+            const playerStatus = document.getElementById('playerStatus');
+            
+            if(!prompt) {
+                alert('請先輸入您的音樂提示詞！');
+                return;
+            }
+
+            playerStatus.innerText = "Gemini 深度解析中...";
+
+            try {
+                // 發送請求給容器內的 FastAPI 後端
+                const response = await fetch('http://localhost:8000/api/recommend', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ prompt: prompt })
+                });
+
+                if (!response.ok) throw new Error('伺服器回應錯誤');
+
+                const data = await response.json();
+
+                // 更新 5-D 矩陣
+                document.getElementById('resArtist').innerText = data.artist_reference || '無對標';
+                document.getElementById('resMood').innerText = data.mood_vibe || '通用';
+                document.getElementById('resMelody').innerText = data.melody_structure || '自由旋律';
+                document.getElementById('resTempo').innerText = data.tempo_bpm || '標準速度';
+                document.getElementById('resInst').innerText = data.instrumentation || '綜合樂器';
+
+                // 動態渲染推薦清單
+                const trackListContainer = document.getElementById('trackList');
+                trackListContainer.innerHTML = '';
+
+                if(data.tracks && data.tracks.length > 0) {
+                    data.tracks.forEach((track, index) => {
+                        const tagsText = Array.isArray(track.tags) ? track.tags.join(', ') : track.tags;
+                        const trackHTML = `
+                            <div class="track-card">
+                                <div class="track-info">
+                                    <h3>${track.title}</h3>
+                                    <div class="track-meta">
+                                        <span>匹配度 ${track.match_score}</span>
+                                        <span>•</span>
+                                        <span>${track.artist_style}</span>
+                                        <span>•</span>
+                                        <span>${tagsText}</span>
+                                    </div>
+                                </div>
+                                <button class="play-action-btn" onclick="playAudioNote(${220 + index * 55}, '${track.title.replace(/'/g, "\\'")}')">▶</button>
+                            </div>
+                        `;
+                        trackListContainer.innerHTML += trackHTML;
+                    });
+                }
+
+                matrixSec.style.display = 'block';
+                matrixSec.scrollIntoView({ behavior: 'smooth' });
+                playerStatus.innerText = "解析完成，準備就緒";
+
+            } catch (error) {
+                console.error(error);
+                alert('無法連線至後端或 AI 解析失敗，請確認 Docker 容器是否已啟動，且開啟在連接埠 8000。');
+                playerStatus.innerText = "解析失敗";
+            }
+        }
+
+        // Web Audio API 音效與 Canvas 動態音波
+        let audioCtx = null;
+        const canvas = document.getElementById('waveformCanvas');
+        const ctx = canvas.getContext('2d');
+        let animationId = null;
+
+        function resizeCanvas() {
+            canvas.width = canvas.parentElement.clientWidth;
+            canvas.height = 35;
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        function drawWaveform(active = false) {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.lineWidth = 2;
+            ctx.strokeStyle = active ? '#2997ff' : '#424245';
+            ctx.beginPath();
+
+            const sliceWidth = canvas.width / 50;
+            let x = 0;
+
+            for (let i = 0; i < 50; i++) {
+                const v = active ? Math.random() * 20 + 5 : 2;
+                const y = (canvas.height / 2) + (Math.sin(i + Date.now() * 0.01) * v * 0.5);
+
+                if (i === 0) {
+                    ctx.moveTo(x, y);
+                } else {
+                    ctx.lineTo(x, y);
+                }
+                x += sliceWidth;
+            }
+            ctx.stroke();
+            animationId = requestAnimationFrame(() => drawWaveform(active));
+        }
+        drawWaveform(false);
+
+        function playAudioNote(freq, title) {
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            }
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+
+            gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 2.5);
+
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+
+            osc.start();
+            osc.stop(audioCtx.currentTime + 2.5);
+
+            document.getElementById('nowPlayingTitle').innerText = title || "AI 合成音效";
+            document.getElementById('nowPlayingArtist').innerText = "AI 即時生成中 (Web Audio API)";
+            document.getElementById('playerStatus').innerText = "播放中 ♫";
+
+            if (animationId) cancelAnimationFrame(animationId);
+            drawWaveform(true);
+
+            setTimeout(() => {
+                document.getElementById('playerStatus').innerText = "播放完畢";
+                cancelAnimationFrame(animationId);
+                drawWaveform(false);
+            }, 2500);
+        }
+    </script>
+</body>
+</html>
